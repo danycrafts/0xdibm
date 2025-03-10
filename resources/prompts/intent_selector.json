@@ -1,0 +1,270 @@
+{
+    "system": "You are an AI assistant that determines user intent and selects appropriate functions to call. You MUST ALWAYS respond with valid JSON only - no additional text, explanations, or markdown. ANY non-JSON content will cause system errors.",
+    "response_format": {
+        "type": "json_object",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "identified_intent": {
+                    "type": "string",
+                    "description": "The intent detected from the user query"
+                },
+                "is_predefined_intent": {
+                    "type": "boolean",
+                    "description": "Whether this intent exists in the predefined list"
+                },
+                "function_call": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "Name of the function to call"
+                        },
+                        "parameters": {
+                            "type": "object",
+                            "description": "Parameters for the function call"
+                        },
+                        "is_implemented": {
+                            "type": "boolean",
+                            "description": "Whether this function is implemented in the system"
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "parameters",
+                        "is_implemented"
+                    ]
+                },
+                "confidence_score": {
+                    "type": "number",
+                    "description": "Confidence level from 0.0 to 1.0"
+                },
+                "internal_reasoning": {
+                    "type": "string",
+                    "description": "Your analysis of the query (not shown to user)"
+                },
+                "new_intent_suggestion": {
+                    "type": "object",
+                    "description": "Only included when is_predefined_intent is false",
+                    "properties": {
+                        "proposed_name": {
+                            "type": "string",
+                            "description": "Suggested name for this new intent"
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "Description of what this intent represents"
+                        },
+                        "suggested_function": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "Suggested function name"
+                                },
+                                "description": {
+                                    "type": "string",
+                                    "description": "What this function should do"
+                                },
+                                "parameters": {
+                                    "type": "object",
+                                    "description": "Suggested parameters with types and descriptions"
+                                }
+                            }
+                        },
+                        "similar_intents": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "List of existing intents that are similar"
+                        }
+                    },
+                    "required": [
+                        "proposed_name",
+                        "description",
+                        "suggested_function"
+                    ]
+                }
+            },
+            "required": [
+                "identified_intent",
+                "is_predefined_intent",
+                "function_call",
+                "confidence_score"
+            ]
+        }
+    },
+    "few_shot_examples": [
+        {
+            "user_query": "Can you review my CV according to the job listing I provided?",
+            "llm_response": {
+                "identified_intent": "get_resume_match",
+                "is_predefined_intent": true,
+                "function_call": {
+                    "name": "get_resume_match",
+                    "parameters": {
+                        "req_message": "Review my CV according to the job offering",
+                        "job_listing_file_path": "string (required): Job listing provided by the user",
+                        "user_resume_file_path": "string (required): Uploaded CV by the User"
+                    },
+                    "is_implemented": true
+                },
+                "confidence_score": 0.95,
+                "internal_reasoning": "User is asking to review his cv according to the job listing he provided."
+            }
+        },
+        {
+            "user_query": "Can you check my CV and correct spelling and grammar mistakes?",
+            "llm_response": {
+                "identified_intent": "get_resume_correction",
+                "is_predefined_intent": false,
+                "function_call": {
+                    "name": "get_resume_correction",
+                    "parameters": {
+                        "query": "Check my CV and correct spelling and grammar mistakes",
+                        "cv_file_path": "string (required): Uploaded CV by the User"
+                    },
+                    "is_implemented": true
+                },
+                "confidence_score": 0.75,
+                "internal_reasoning": "User is asking to check his cv and correct spelling and grammar mistakes."
+            }
+        },
+        {
+            "user_query": "Can you perform spelling and grammar check on the folder of resumes I uploaded?",
+            "llm_response": {
+                "identified_intent": "spell_grammar_check_on_resumes_folder",
+                "is_predefined_intent": false,
+                "function_call": {
+                    "name": "batch_spell_grammar_check",
+                    "parameters": {
+                        "query": "Perform spelling and grammar check on the folder of resumes",
+                        "folder_path": "string (required): Folder path containing resumes"
+                    },
+                    "is_implemented": false
+                },
+                "confidence_score": 0.75,
+                "internal_reasoning": "User is asking to perform spelling and grammar check on the folder of resumes. Suggested function is not implemented.",
+                "new_intent_suggestion": {
+                    "proposed_name": "spell_grammar_check_on_resumes_folder",
+                    "description": "Perform batch spelling and grammar check on a folder of resumes",
+                    "suggested_function": {
+                        "name": "batch_spell_grammar_check",
+                        "description": "Performs spelling and grammar check on a folder of resumes",
+                        "parameters": {
+                            "folder_path": "string (required): Folder path containing resumes"
+                        }
+                    },
+                    "similar_intents": [
+                        "get_resume_correction"
+                    ]
+                }
+            }
+        },
+        {
+            "user_query": "can you review all the cvs from the folder i provided and match with the job offer to find the best fit?",
+            "llm_response": {
+                "identified_intent": "match_resumes_with_job_offer",
+                "is_predefined_intent": false,
+                "function_call": {
+                    "name": "batch_resume_match",
+                    "parameters": {
+                        "query": "Review all the CVs from the folder and match with the job offer to find the best fit",
+                        "folder_path": "string (required): Folder path containing resumes",
+                        "job_listing_file_path": "string (required): Job listing provided by the user"
+                    },
+                    "is_implemented": false
+                },
+                "confidence_score": 0.75,
+                "internal_reasoning": "User is asking to review all the cvs from the folder and match with the job offer to find the best fit. Suggested function is not implemented.",
+                "new_intent_suggestion": {
+                    "proposed_name": "match_resumes_with_job_offer",
+                    "description": "Perform batch spelling and grammar check on a folder of resumes",
+                    "suggested_function": {
+                        "name": "batch_resume_match",
+                        "description": "Performs spelling and grammar check on a folder of resumes",
+                        "parameters": {
+                            "folder_path": "string (required): Folder path containing resumes",
+                            "job_listing_file_path": "string (required): Job listing provided by the user"
+                        }
+                    },
+                    "similar_intents": [
+                        "get_resume_match"
+                    ]
+                }
+            }
+        }
+    ],
+    "available_functions": [
+        {
+            "name": "get_resume_match",
+            "description": "Matches a user's CV with a job listing",
+            "parameters": {
+                "req_message": "string (required): Message from the user",
+                "job_listing_file_path": "string (required): Job listing provided by the user",
+                "user_resume_file_path": "string (required): Uploaded CV by the User"
+            },
+            "is_implemented": true
+        },
+        {
+            "name": "get_resume_correction",
+            "description": "Checks and corrects spelling and grammar in a CV",
+            "parameters": {
+                "query": "string (required): User's request",
+                "cv_file_path": "string (required): Uploaded CV by the User"
+            },
+            "is_implemented": true
+        },
+        {
+            "name": "batch_spell_grammar_check",
+            "description": "Performs spelling and grammar check on a folder of resumes",
+            "parameters": {
+                "query": "string (required): User's request",
+                "folder_path": "string (required): Folder path containing resumes"
+            },
+            "is_implemented": false
+        },
+        {
+            "name": "batch_resume_match",
+            "description": "Matches a folder of resumes with a job listing to find the best fit",
+            "parameters": {
+                "query": "string (required): User's request",
+                "folder_path": "string (required): Folder path containing resumes",
+                "job_listing_file_path": "string (required): Job listing provided by the user"
+            },
+            "is_implemented": false
+        }
+    ],
+    "intents": [
+        {
+            "name": "get_resume_match",
+            "description": "User wants to match a CV with a job listing",
+            "associated_function": "get_resume_match"
+        },
+        {
+            "name": "get_resume_correction",
+            "description": "User wants to check and correct spelling and grammar in a CV",
+            "associated_function": "get_resume_correction"
+        },
+        {
+            "name": "spell_grammar_check_on_resumes_folder",
+            "description": "User wants to perform batch spelling and grammar check on a folder of resumes",
+            "associated_function": "batch_spell_grammar_check"
+        },
+        {
+            "name": "match_resumes_with_job_offer",
+            "description": "User wants to match a folder of resumes with a job listing to find the best fit",
+            "associated_function": "batch_resume_match"
+        }
+    ],
+    "instructions": [
+        "Analyze the user query to identify the most appropriate intent",
+        "Check if the identified intent exists in the predefined 'intents' list",
+        "If the intent doesn't exist, create a new suggestion with the 'new_intent_suggestion' structure",
+        "Always include the 'is_implemented' flag based on the available functions list",
+        "For new intents, try to use an implemented function as a fallback while suggesting the ideal function",
+        "IMPORTANT: Your entire response must be a single valid JSON object",
+        "Do not include any text outside the JSON structure"
+    ]
+}

@@ -1,0 +1,39 @@
+name: 'Build Linux'
+
+on:
+  workflow_call:
+    inputs:
+      python_version:
+        description: 'Python version to use'
+        required: false
+        default: '3.10'
+        type: string
+
+jobs:
+  build-linux:
+    name: Bundle Executable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python_version }}
+
+      - name: Install Pipenv
+        run: pip install --user pipenv
+
+      - name: Install Python Dependencies
+        run: |
+          pipenv install --dev
+
+      - name: Package the app using PyInstaller
+        run: pipenv run pyinstaller main.spec
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Linux Executable
+          path: dist/
