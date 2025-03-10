@@ -37,7 +37,7 @@ if sys.platform == 'win32':
         a.scripts,
         [],
         exclude_binaries=True,  # Changed this to True
-        name='app',
+        name='desh_app_windows',
         debug=False,
         bootloader_ignore_signals=False,
         strip=False,
@@ -54,7 +54,7 @@ if sys.platform == 'win32':
         strip=False,
         upx=True,
         upx_exclude=[],
-        name='app',
+        name='desh_app_windows',
     )
     
 # Linux specific configuration
@@ -64,7 +64,7 @@ elif sys.platform.startswith('linux'):
         a.scripts,
         [],
         exclude_binaries=True,  # Changed this to True
-        name='app',
+        name='desh_app_linux',
         debug=False,
         bootloader_ignore_signals=False,
         strip=False,
@@ -80,5 +80,5 @@ elif sys.platform.startswith('linux'):
         strip=False,
         upx=True,
         upx_exclude=[],
-        name='app',
+        name='desh_app_linux',
     )

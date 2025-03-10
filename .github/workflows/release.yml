@@ -25,9 +25,9 @@ jobs:
     with:
       repo: 'ghcr.io/${{ github.repository }}'
       context_path: '.'
-      image: 'cvgenerator'
+      image: 'desh_app'
       tag: ${{ github.ref_name }}
-      dockerfile_path: './DockerFile'
+      dockerfile_path: './Dockerfile'
     secrets:
       PACKAGES_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
@@ -58,9 +58,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            artifacts/cvgenerator_linux
-            artifacts/cvgenerator_macos_arm
-            artifacts/cvgenerator_windows_x64.exe
+            artifacts/desh_app_linux
+            artifacts/desh_app_windows
           body: ${{ steps.release_message.outputs.message }}
           tag_name: ${{ github.ref_name }}
         env:
